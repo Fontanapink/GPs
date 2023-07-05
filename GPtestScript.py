@@ -596,6 +596,9 @@ print_summary(anova_kernel)
 best_BIC = 10000000
 
 # %% Testing the ANOVA kernel
+# You can create ANOVA kernels by using the build in sum and product of existing kernels (say Bias and RBF) with an active_dimension for the RBF . With this approach you don't have to write your own kernel class.
+# The following code creates an ANOVA kernel with 2 dimensions, one for the Bias and one for the RBF kernel.
+
 bias = gpf.kernels.Bias()
 k0 = gpf.kernels.RBF(active_dims=[0])
 k1 = gpf.kernels.RBF(active_dims=[1])
