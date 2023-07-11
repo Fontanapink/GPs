@@ -145,6 +145,9 @@ def count_params(m):
 def get_BIC(m, F, n):
     # Assumes F = -lnL
     # QUESTION: is this correct? Are we sure it is model parameters and not number of kernels parameters?
+    # NOTE: This is the Bayesian Information Criterion (BIC) (Schwarz, 1978) which is a penalized version of the log marginal likelihood (F)
+    # This is also shown in lloyd_2014_AutomaticConstructionNaturalLanguage.
+
     k = count_params(m)
     return -2 * F + k * np.log(n)
     #return (-1/2)*k*np.log(n) + F
