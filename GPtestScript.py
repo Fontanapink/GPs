@@ -127,7 +127,8 @@ def optimize_model_with_scipy(model):
 
 
 def count_params(m):
-    p_dict = parameter_dict(m)
+    p_dict = parameter_dict(m.trainable_parameters)
+    # p_dict = parameter_dict(m)
     p_count = 0
     for val in p_dict.values():
         # print(val.shape)
@@ -145,7 +146,9 @@ def get_BIC(m, F, n):
     # Assumes F = -lnL
     # QUESTION: is this correct? Are we sure it is model parameters and not number of kernels parameters?
     k = count_params(m)
-    return k*np.log(n) + 2*F
+    return -2 * F + k * np.log(n)
+    #return (-1/2)*k*np.log(n) + F
+    # return k*np.log(n) + 2*F 
 
 
 # %%
@@ -221,6 +224,11 @@ res = gpf.optimizers.Scipy().minimize(
     options=dict(maxiter=maxiter),
     method="L-BFGS-B",
 )
+# # get the maximum likelihood estimate of model hyperparameters
+# m.kernel.kernels[0].lengthscales.numpy()
+# m.kernel.kernels[0].variance.numpy()
+# m.kernel.kernels[1].W.numpy()
+# m.likelihood.variance.numpy()
 
 
 print_summary(m)
@@ -390,7 +398,7 @@ if BIC < best_BIC:
 # %%
 # Identifying the best kernel, mean function and latent process dimensionality for the data set using BIC score as the metric for comparison of models
 
-best_BIC = 10000000
+best_BIC = 0
 kernels = [gpf.kernels.SquaredExponential, gpf.kernels.Matern32, gpf.kernels.RationalQuadratic, gpf.kernels.Exponential, gpf.kernels.Linear,
            gpf.kernels.Cosine, gpf.kernels.Periodic, gpf.kernels.Polynomial, gpf.kernels.Matern12, gpf.kernels.Matern52, gpf.kernels.White]
 reduced_kernels = [gpf.kernels.SquaredExponential, gpf.kernels.Matern32,
@@ -399,23 +407,23 @@ for L in range(1, 4):
     for K_L in reduced_kernels:
         for M_F in [None, gpf.functions.Polynomial(2)]:
             m, BIC = fit_model(X_aug, Y_aug, P=3, L=L, K_L=K_L, M_F=M_F)
-            if BIC < best_BIC:
+            if BIC > best_BIC:
                 best_model = m
                 best_BIC = BIC
                 best_L = L
                 best_K_L = K_L
                 best_M_F = M_F
 
+
 # %%
-print(best_BIC)
+print("best BIC: " + str(best_BIC))
 if 'best_L' in locals():
-    print(best_L)
+    print("N# latent processes: " + str(best_L))
 else:
     print("best_L is not defined")
-print(best_K_L.__name__)
-print(best_M_F.__class__.__name__)
+print("Kernel: " + str(best_K_L.__name__))
+print("Mean Function: " + str(best_M_F.__class__.__name__))
 print_summary(best_model)
-count_params(m)
 
 
 # %%
