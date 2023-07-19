@@ -189,8 +189,8 @@ Y_aug = np.vstack(
 )
 
 # print(X)
-# print(X_aug)
-# print(Y_aug)
+print(X_aug.shape)
+print(Y_aug.shape)
 
 # %%
 L = 1  # latent processes, g in R^L
