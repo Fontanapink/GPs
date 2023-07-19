@@ -287,7 +287,10 @@ def main():
     
     # Finally, plot the model
     plot_model(m, timeSeries, y, P, L, K_L, M_F, BIC)
+    plt.savefig(os.path.join(os.getcwd(), 'plot.png', dpi=500))
     plt.show()
+    # Save the figure to a file in the current directory
+    
 
 
 
@@ -296,7 +299,11 @@ def main():
     BICs = [x[1] for x in results]
     plt.plot(BICs)
     plt.plot(BICs.index(BIC), BIC, 'ro')
+    plt.xlabel('Model')
+    plt.ylabel('BIC')
+    plt.savefig(os.path.join(os.getcwd(), 'BICs.png'), dpi=500)
     plt.show()
+    
 
         
     # Save the results to a file
