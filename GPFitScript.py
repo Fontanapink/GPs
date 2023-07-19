@@ -87,6 +87,10 @@ def generateLibrary():
     # Define the list of all the possible kernel, mean, and latent processes
     kernelList = [gpf.kernels.SquaredExponential, gpf.kernels.Matern32, gpf.kernels.RationalQuadratic, gpf.kernels.Exponential, gpf.kernels.Linear,
            gpf.kernels.Cosine, gpf.kernels.Periodic, gpf.kernels.Polynomial, gpf.kernels.Matern12, gpf.kernels.Matern52, gpf.kernels.White]
+    # QUESTION looks like the Perdiodic kernel doesn't have active dims, then it breaks the code
+    # TODO: check active dims for the periodic kernel
+    kernelList = [gpf.kernels.SquaredExponential, gpf.kernels.Matern32, gpf.kernels.RationalQuadratic, gpf.kernels.Exponential, gpf.kernels.Linear,
+           gpf.kernels.Cosine, gpf.kernels.Polynomial, gpf.kernels.Matern12, gpf.kernels.Matern52, gpf.kernels.White]
     meanList = [gpf.mean_functions.Constant(), gpf.mean_functions.Linear(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero(), 
                 gpf.mean_functions.Polynomial(2), gpf.mean_functions.Polynomial(3), gpf.mean_functions.Polynomial(4), gpf.mean_functions.Polynomial(5)]
     reduced_meanList = [None, gpf.mean_functions.Constant(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero()]
@@ -193,7 +197,7 @@ def fit_model(X_aug, Y_aug, P, L, K_L=gpf.kernels.SquaredExponential, M_F=None):
     # fit the covariance function parameters
     # FIXME: maxiter is defined twice, once here and once as a global variable.
     maxiter = reduce_in_tests(10000)
-    print("kernel: ", k, ", mean: ", M_F, ", latent: ", L)
+    # print("kernel: ", str(K_L.__name__), ", mean: ", str(M_F.__class__.__name__), ", latent: ", L)
     res = optimize_model_with_scipy(m, X_aug, Y_aug)
     # res = gpf.optimizers.Scipy().minimize(
     #     m.training_loss,
@@ -261,6 +265,7 @@ def main():
     results = []
     for kernel, mean, latent in library:
         for L in [1, 2, 3]:
+            print("kernel: ", str(kernel.__name__), ", mean: ", str(mean.__class__.__name__), ", latent: ", L)
             m, BIC = fit_model(X, Y, P, L, kernel, mean)
             results.append([m, BIC, kernel, mean, L])
     # FIXME: This should be uncommented in the final version and use latent processes
@@ -281,7 +286,7 @@ def main():
 
     
     # Finally, plot the model
-    plot_model(m, timeSeries, Y, P, L, K_L, M_F, BIC)
+    plot_model(m, timeSeries, y, P, L, K_L, M_F, BIC)
     plt.show()
 
 
