@@ -42,7 +42,8 @@ gpf.config.set_default_summary_fmt("notebook")
 
 # Define the maximum number of iterations for the optimization
 # FIXME: This should be an input argument
-MAXITER = reduce_in_tests(5000)
+# TODO: Change back to 5000 after testing
+MAXITER = reduce_in_tests(1000)
 
 import tensorflow as tf
 import time
@@ -88,11 +89,14 @@ def generateLibrary():
            gpf.kernels.Cosine, gpf.kernels.Periodic, gpf.kernels.Polynomial, gpf.kernels.Matern12, gpf.kernels.Matern52, gpf.kernels.White]
     meanList = [gpf.mean_functions.Constant(), gpf.mean_functions.Linear(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero(), 
                 gpf.mean_functions.Polynomial(2), gpf.mean_functions.Polynomial(3), gpf.mean_functions.Polynomial(4), gpf.mean_functions.Polynomial(5)]
+    reduced_meanList = [None, gpf.mean_functions.Constant(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero()]
     latentList = [gpf.likelihoods.Gaussian(), gpf.likelihoods.StudentT()]
+    latent_processes = [1, 2, 3]
     # Define the list of all the possible combinations of kernel, mean, and latent processes
     library = []
     for kernel in kernelList:
-        for mean in meanList:
+        # TODO: Change back to meanList after testing
+        for mean in reduced_meanList:
             for latent in latentList:
                 library.append([kernel, mean, latent])
     # Return the library
@@ -110,8 +114,9 @@ def plot_gp_d(x, mu, var, color, label, ax):
     ax.set_xlabel("X")
     ax.set_ylabel("y")
 
-def plot_model(m, X, P, L, K_L, M_F, BIC):
+def plot_model(m, X, Y, P, L, K_L, M_F, BIC):
     fig, ax = plt.subplots(figsize=(15, 5), ncols=3, nrows=1)
+    # FIXME: this should be a loop over the number of species once that is automatic
     ax[0].plot(X[:, 0], Y[:, 0], "bx", mew=2)
     ax[1].plot(X[:, 0], Y[:, 1], "gx", mew=2)
     ax[2].plot(X[:, 0], Y[:, 2], "rx", mew=2)
@@ -129,10 +134,12 @@ def plot_model(m, X, P, L, K_L, M_F, BIC):
     fig.suptitle('species= ' + str(P) + ', latent_processes= ' + str(L) + ', kernel= ' +
                  str(K_L.__name__) + ', mean= ' + str(M_F.__class__.__name__) + ', BIC =' + str(BIC))
 
-def optimize_model_with_scipy(model):
+
+# FIXME: This definition is not used in the FitModel function
+def optimize_model_with_scipy(model, X, Y):
     optimizer = gpf.optimizers.Scipy()
     res = optimizer.minimize(
-        model.training_loss_closure((X, Y)),
+        model.training_loss_closure(),
         variables=model.trainable_variables,
         method="l-bfgs-b",
         # options={"disp": 50, "maxiter": MAXITER},
@@ -145,7 +152,6 @@ def count_params(m):
     # p_dict = parameter_dict(m)
     p_count = 0
     for val in p_dict.values():
-        # print(val.shape)
         if len(val.shape) == 0:
             p_count = p_count + 1
         else:
@@ -157,6 +163,52 @@ def count_params(m):
 def get_BIC(m, F, n):
     k = count_params(m)
     return -2 * F + k * np.log(n)
+
+def fit_model(X_aug, Y_aug, P, L, K_L=gpf.kernels.SquaredExponential, M_F=None):
+
+    # Base kernel for leatent processes
+    # k = gpf.kernels.Matern32(active_dims=[0])
+    # k = gpf.kernels.SquaredExponential(active_dims=[0])
+
+    k = K_L(active_dims=[0])
+
+    # Coregion kernel
+    coreg = gpf.kernels.Coregion(
+        output_dim=P,
+        rank=L,
+        active_dims=[1]
+    )
+
+    kern = k * coreg
+
+    # This likelihood switches between Gaussian noise with different variances for each f_i:
+    lik = gpf.likelihoods.SwitchedLikelihood(
+        [gpf.likelihoods.Gaussian() for _ in range(P)]
+    )
+
+    # now build the GP model as normal
+    m = gpf.models.VGP((X_aug, Y_aug), kernel=kern,
+                       likelihood=lik, mean_function=M_F)
+
+    # fit the covariance function parameters
+    # FIXME: maxiter is defined twice, once here and once as a global variable.
+    maxiter = reduce_in_tests(10000)
+    print("kernel: ", k, ", mean: ", M_F, ", latent: ", L)
+    res = optimize_model_with_scipy(m, X_aug, Y_aug)
+    # res = gpf.optimizers.Scipy().minimize(
+    #     m.training_loss,
+    #     m.trainable_variables,
+    #     options=dict(maxiter=maxiter),
+    #     method="L-BFGS-B",
+    # )
+
+
+    # NOTE: see if this is X_aug or TimeSeries
+    BIC = get_BIC(m, res.fun, X_aug.shape[0])
+    print("BIC:", BIC)
+    
+
+    return m, BIC
 
 def main():
     parser = argparse.ArgumentParser(description='Gaussian Process fitting and plotting')
@@ -196,8 +248,87 @@ def main():
     #y = y.T
     X, Y = augmentData(timeSeries, y)
 
-    print(X.shape)
-    print(Y.shape)
+    # P and L are the number of species and latent processes respectively
+    # FIXME: These should be input arguments or obtained from the input data
+    P = 3
+    L = [1, 2, 3]
+
+    # Generate the library of all the possible kernel, mean, and latent processes combinations
+    library = generateLibrary()
+
+    # Fit each of the models in the library to the data
+    # and store the results in a list
+    results = []
+    for kernel, mean, latent in library:
+        for L in [1, 2, 3]:
+            m, BIC = fit_model(X, Y, P, L, kernel, mean)
+            results.append([m, BIC, kernel, mean, L])
+    # FIXME: This should be uncommented in the final version and use latent processes
+    # and automatic P and L
+                
+    # for kernel, mean, latent in library:
+    #     m, BIC = fit_model(X, Y, y.shape[1], y.shape[1], kernel, mean)
+    #     results.append([m, BIC, kernel, mean, latent])
+
+    # Find the best fitted model
+    # by finding the model with the highest BIC
+    bestModel = max(results, key=lambda x: x[1])
+    m = bestModel[0]
+    BIC = bestModel[1]
+    K_L = bestModel[2]
+    M_F = bestModel[3]
+    L = bestModel[4]
+
+    
+    # Finally, plot the model
+    plot_model(m, timeSeries, Y, P, L, K_L, M_F, BIC)
+    plt.show()
+
+
+
+    # Show a plot with all the calculated BIC values
+    # and the one chosen to be the best
+    BICs = [x[1] for x in results]
+    plt.plot(BICs)
+    plt.plot(BICs.index(BIC), BIC, 'ro')
+    plt.show()
+
+        
+    # Save the results to a file
+    # with open(outputFile, 'w') as f:
+    #     writer = csv.writer(f)
+    #     writer.writerow(['BIC', 'Kernel', 'Mean', 'Latent'])
+    #     for result in results:
+    #         writer.writerow([result[1], result[2], result[3], result[4]])
+    #     writer.writerow(['Best model', BIC, K_L, M_F, L])
+    #     writer.writerow(['Time series', timeSeries])
+    #     writer.writerow(['Data', y])
+    #     writer.writerow(['X', X])
+    #     writer.writerow(['Y', Y])
+    #     writer.writerow(['Model', m])
+    #     writer.writerow(['BICs', BICs])
+    #     writer.writerow(['Best model', bestModel])
+    #     writer.writerow(['Results', results])
+    #     writer.writerow(['Library', library])
+    #     writer.writerow(['Input file', inputFile])
+    #     writer.writerow(['Output file', outputFile])
+    #     writer.writerow(['Arguments', args])
+    #     writer.writerow(['Data', data])
+    #     writer.writerow(['Time series', timeSeries])
+    #     writer.writerow(['y', y])
+    #     writer.writerow(['X', X])
+    #     writer.writerow(['Y', Y])
+    #     writer.writerow(['Model', m])
+    #     writer.writerow(['BICs', BICs])
+    #     writer.writerow(['Best model', bestModel])
+
+        
+    # Save the model to a file
+
+    
+    
+
+
 
 if __name__ == "__main__":
     main()
