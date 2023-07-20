@@ -40,11 +40,6 @@ from gpflow.ci_utils import reduce_in_tests
 gpf.config.set_default_float(np.float64)
 gpf.config.set_default_summary_fmt("notebook")
 
-# Define the maximum number of iterations for the optimization
-# FIXME: This should be an input argument
-# TODO: Change back to 5000 after testing
-MAXITER = reduce_in_tests(1000)
-
 import tensorflow as tf
 import time
 import datetime
@@ -91,8 +86,10 @@ def generateLibrary():
     # TODO: check active dims for the periodic kernel
     kernelList = [gpf.kernels.SquaredExponential, gpf.kernels.Matern32, gpf.kernels.RationalQuadratic, gpf.kernels.Exponential, gpf.kernels.Linear,
            gpf.kernels.Cosine, gpf.kernels.Polynomial, gpf.kernels.Matern12, gpf.kernels.Matern52, gpf.kernels.White]
+    # QUESTION: Is mean zero the same as no mean? or None?
     meanList = [gpf.mean_functions.Constant(), gpf.mean_functions.Linear(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero(), 
                 gpf.mean_functions.Polynomial(2), gpf.mean_functions.Polynomial(3), gpf.mean_functions.Polynomial(4), gpf.mean_functions.Polynomial(5)]
+    # TODO: keep on adding different mean functions
     reduced_meanList = [None, gpf.mean_functions.Constant(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero()]
     latentList = [gpf.likelihoods.Gaussian(), gpf.likelihoods.StudentT()]
     latent_processes = [1, 2, 3]
@@ -106,6 +103,7 @@ def generateLibrary():
     # Return the library
     return library
 
+# This function is used to plot the results of the fitted model and its 95% confidence interval
 def plot_gp_d(x, mu, var, color, label, ax):
     ax.plot(x, mu, color=color, lw=2, label=label)
     ax.fill_between(
@@ -118,6 +116,7 @@ def plot_gp_d(x, mu, var, color, label, ax):
     ax.set_xlabel("X")
     ax.set_ylabel("y")
 
+# This function is used to plot the results of the fitted model and the data
 def plot_model(m, X, Y, P, L, K_L, M_F, BIC):
     fig, ax = plt.subplots(figsize=(15, 5), ncols=3, nrows=1)
     # FIXME: this should be a loop over the number of species once that is automatic
@@ -195,8 +194,7 @@ def fit_model(X_aug, Y_aug, P, L, K_L=gpf.kernels.SquaredExponential, M_F=None):
                        likelihood=lik, mean_function=M_F)
 
     # fit the covariance function parameters
-    # FIXME: maxiter is defined twice, once here and once as a global variable.
-    maxiter = reduce_in_tests(10000)
+
     # print("kernel: ", str(K_L.__name__), ", mean: ", str(M_F.__class__.__name__), ", latent: ", L)
     res = optimize_model_with_scipy(m, X_aug, Y_aug)
     # res = gpf.optimizers.Scipy().minimize(
@@ -218,6 +216,8 @@ def main():
     parser = argparse.ArgumentParser(description='Gaussian Process fitting and plotting')
     parser.add_argument('-i','--input', help='Input file name', required=True)
     parser.add_argument('-o','--output', help='Output file path', required=False, default='output.csv')
+    # make maxiter an optional input argument, with a default value of 5000
+    parser.add_argument('-m','--maxiter', help='Maximum number of iterations for the optimization', required=False, default=10000)
     args = vars(parser.parse_args())
 
     # Store the input arguments
@@ -240,6 +240,10 @@ def main():
     if not os.path.isdir(os.path.dirname(outputFile)):
         print('The output file path does not exist, setting it to the current directory')
         outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
+
+    # Store the maximum number of iterations for the optimization
+    global MAXITER 
+    MAXITER = reduce_in_tests(args['maxiter'])
 
     data = importData(inputFile)
     # store the time series data in a variable, without the column header
@@ -287,7 +291,7 @@ def main():
     
     # Finally, plot the model
     plot_model(m, timeSeries, y, P, L, K_L, M_F, BIC)
-    plt.savefig(os.path.join(os.getcwd(), 'plot.png', dpi=500))
+    plt.savefig(os.path.join(os.getcwd(), 'plot.png'), dpi=500)
     plt.show()
     # Save the figure to a file in the current directory
     
