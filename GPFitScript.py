@@ -18,8 +18,9 @@ The script could also plot the results of the best fitted model with the data
 The script could also plot the results of the best fitted model with the data and the 95% confidence interval
 
 usage: GPFit.py [-h] -i INPUT [-o OUTPUT]
--i <input file>: The path to the input file
--o <output file path>: The path to the output file
+-i <input file>: The path to the input file with the data
+-o <output file path>: The path to the output file where the results will be stored
+-m <maxiter>: The maximum number of iterations for the optimization
 """
 
 # Import the necessary libraries
@@ -124,6 +125,10 @@ def plot_model(m, X, Y, P, L, K_L, M_F, BIC):
     ax[1].plot(X[:, 0], Y[:, 1], "gx", mew=2)
     ax[2].plot(X[:, 0], Y[:, 2], "rx", mew=2)
 
+    color1 = "#21d524"
+    color2 = "#d52421"
+    color3 = "#24d5d5"
+
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(np.hstack((X, np.zeros_like(X))))
     plot_gp_d(X, mu1, var1, "b", "Y1", ax[0])
@@ -138,7 +143,8 @@ def plot_model(m, X, Y, P, L, K_L, M_F, BIC):
                  str(K_L.__name__) + ', mean= ' + str(M_F.__class__.__name__) + ', BIC =' + str(BIC))
 
 
-# FIXME: This definition is not used in the FitModel function
+# This function is used to optimize the model with scipy
+# QUESTION: Should we use lmfit instead of scipy?
 def optimize_model_with_scipy(model, X, Y):
     optimizer = gpf.optimizers.Scipy()
     res = optimizer.minimize(
@@ -197,6 +203,7 @@ def fit_model(X_aug, Y_aug, P, L, K_L=gpf.kernels.SquaredExponential, M_F=None):
 
     # print("kernel: ", str(K_L.__name__), ", mean: ", str(M_F.__class__.__name__), ", latent: ", L)
     res = optimize_model_with_scipy(m, X_aug, Y_aug)
+    # NOTE: This is the original minimize function, see if it gives the same results as optimize_model_with_scipy()
     # res = gpf.optimizers.Scipy().minimize(
     #     m.training_loss,
     #     m.trainable_variables,
@@ -213,9 +220,9 @@ def fit_model(X_aug, Y_aug, P, L, K_L=gpf.kernels.SquaredExponential, M_F=None):
     return m, BIC
 
 def main():
-    parser = argparse.ArgumentParser(description='Gaussian Process fitting and plotting')
-    parser.add_argument('-i','--input', help='Input file name', required=True)
-    parser.add_argument('-o','--output', help='Output file path', required=False, default='output.csv')
+    parser = argparse.ArgumentParser(description='Gaussian Process fitting and plotting script')
+    parser.add_argument('-i','--input', help='Input file name/path with simulated data', required=True)
+    parser.add_argument('-o','--output', help='Output file path where output files/models are going to be stored', required=False, default='output.csv')
     # make maxiter an optional input argument, with a default value of 5000
     parser.add_argument('-m','--maxiter', help='Maximum number of iterations for the optimization', required=False, default=10000)
     args = vars(parser.parse_args())
