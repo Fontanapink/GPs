@@ -132,12 +132,18 @@ def plot_model(m, X, Y, P, L, K_L, M_F, BIC):
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(np.hstack((X, np.zeros_like(X))))
     plot_gp_d(X, mu1, var1, "b", "Y1", ax[0])
+    ax[0].set_xlabel("time")
+    ax[0].set_ylabel("y_1")
 
     mu2, var2 = m.predict_y(np.hstack((X, np.ones_like(X))))
     plot_gp_d(X, mu2, var2, "g", "Y2", ax[1])
+    ax[1].set_xlabel("time")
+    ax[1].set_ylabel("y_2")
 
     mu3, var3 = m.predict_y(np.hstack((X, 2*np.ones_like(X))))
     plot_gp_d(X, mu3, var3, "r", "Y3", ax[2])
+    ax[2].set_xlabel("time")
+    ax[2].set_ylabel("y_3")
 
     fig.suptitle('species= ' + str(P) + ', latent_processes= ' + str(L) + ', kernel= ' +
                  str(K_L.__name__) + ', mean= ' + str(M_F.__class__.__name__) + ', BIC =' + str(BIC))
@@ -301,8 +307,6 @@ def main():
     plt.savefig(os.path.join(os.getcwd(), 'plot.png'), dpi=500)
     plt.show()
     # Save the figure to a file in the current directory
-    
-
 
 
     # Show a plot with all the calculated BIC values
@@ -314,44 +318,6 @@ def main():
     plt.ylabel('BIC')
     plt.savefig(os.path.join(os.getcwd(), 'BICs.png'), dpi=500)
     plt.show()
-    
-
-        
-    # Save the results to a file
-    # with open(outputFile, 'w') as f:
-    #     writer = csv.writer(f)
-    #     writer.writerow(['BIC', 'Kernel', 'Mean', 'Latent'])
-    #     for result in results:
-    #         writer.writerow([result[1], result[2], result[3], result[4]])
-    #     writer.writerow(['Best model', BIC, K_L, M_F, L])
-    #     writer.writerow(['Time series', timeSeries])
-    #     writer.writerow(['Data', y])
-    #     writer.writerow(['X', X])
-    #     writer.writerow(['Y', Y])
-    #     writer.writerow(['Model', m])
-    #     writer.writerow(['BICs', BICs])
-    #     writer.writerow(['Best model', bestModel])
-    #     writer.writerow(['Results', results])
-    #     writer.writerow(['Library', library])
-    #     writer.writerow(['Input file', inputFile])
-    #     writer.writerow(['Output file', outputFile])
-    #     writer.writerow(['Arguments', args])
-    #     writer.writerow(['Data', data])
-    #     writer.writerow(['Time series', timeSeries])
-    #     writer.writerow(['y', y])
-    #     writer.writerow(['X', X])
-    #     writer.writerow(['Y', Y])
-    #     writer.writerow(['Model', m])
-    #     writer.writerow(['BICs', BICs])
-    #     writer.writerow(['Best model', bestModel])
-
-        
-    # Save the model to a file
-
-    
-    
-
-
 
 if __name__ == "__main__":
     main()
