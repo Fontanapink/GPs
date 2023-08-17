@@ -26,6 +26,7 @@ usage: GPFit.py [-h] -i INPUT [-o OUTPUT]
 # Import the necessary libraries
 import argparse
 import numpy as np
+import pretty_errors
 # Set the random seed for reproducibility
 # FIXME: This should be removed in the final version
 np.random.seed(0)
@@ -35,7 +36,7 @@ import sys
 import math
 import matplotlib.pyplot as plt
 import gpflow as gpf # This is the library that will be used to fit the Gaussian Process
-from gpflow.utilities import print_summary
+#from gpflow.utilities import print_summary
 from gpflow.utilities import parameter_dict
 from gpflow.ci_utils import reduce_in_tests
 gpf.config.set_default_float(np.float64)
@@ -88,19 +89,17 @@ def generateLibrary():
     kernelList = [gpf.kernels.SquaredExponential, gpf.kernels.Matern32, gpf.kernels.RationalQuadratic, gpf.kernels.Exponential, gpf.kernels.Linear,
            gpf.kernels.Cosine, gpf.kernels.Polynomial, gpf.kernels.Matern12, gpf.kernels.Matern52, gpf.kernels.White]
     # QUESTION: Is mean zero the same as no mean? or None?
-    meanList = [gpf.mean_functions.Constant(), gpf.mean_functions.Linear(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero(), 
-                gpf.mean_functions.Polynomial(2), gpf.mean_functions.Polynomial(3), gpf.mean_functions.Polynomial(4), gpf.mean_functions.Polynomial(5)]
-    # TODO: keep on adding different mean functions
-    reduced_meanList = [None, gpf.mean_functions.Constant(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero()]
-    latentList = [gpf.likelihoods.Gaussian(), gpf.likelihoods.StudentT()]
-    latent_processes = [1, 2, 3]
+    # NOTE: Decided to only try with the zero mean function
+    # meanList = [gpf.mean_functions.Constant(), gpf.mean_functions.Linear(), gpf.mean_functions.Identity(), gpf.mean_functions.Zero(), 
+    #             gpf.mean_functions.Polynomial(2), gpf.mean_functions.Polynomial(3), gpf.mean_functions.Polynomial(4), gpf.mean_functions.Polynomial(5)]
+    mean = gpf.mean_functions.Zero()
+    # NOTE: Decided to only try with the Gaussian likelihood
+    # latlaentList = [gpf.likelihoods.Gaussian(), gpf.likelihoods.StudentT()]
+    likelihood = gpf.likelihoods.Gaussian()
     # Define the list of all the possible combinations of kernel, mean, and latent processes
     library = []
     for kernel in kernelList:
-        # TODO: Change back to meanList after testing
-        for mean in reduced_meanList:
-            for latent in latentList:
-                library.append([kernel, mean, latent])
+        library.append([kernel, mean, likelihood])
     # Return the library
     return library
 
