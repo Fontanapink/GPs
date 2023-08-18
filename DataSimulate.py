@@ -1,5 +1,7 @@
 # This script will be used to simulate the data that will be used to fit the Gaussian Process
 
+# Very simple script that is replaced by the gLVM model script
+
 # Import the required libraries
 import numpy as np
 import matplotlib.pyplot as plt
