@@ -123,7 +123,7 @@ def plot_model(m, X, Y, P, L, K_L, M_F, BIC, i):
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(np.hstack((X, np.zeros_like(X))))
     # save the prediced mu1 values to a csv file
-    #np.savetxt("mu_" + str(i)+ ".csv", mu1, delimiter=",")
+    np.savetxt("mu_" + str(i)+ ".csv", mu1, delimiter=",")
 
 
     plot_gp_d(X, mu1, var1, "b", "Y1", ax)
