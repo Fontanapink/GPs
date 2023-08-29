@@ -25,7 +25,15 @@ print(correlations)
 
 # Plot the correlations
 sns.heatmap(correlations, xticklabels=correlations.columns, yticklabels=correlations.columns, cmap="YlGnBu")
-plt.title("Correlations between samples")
+plt.title("Correlations between species")
+plt.show()
+
+
+# plot using matshow from matplotlib
+plt.matshow(correlations)
+plt.xticks(range(len(correlations.columns)), correlations.columns)
+plt.yticks(range(len(correlations.columns)), correlations.columns)
+plt.colorbar()
 plt.show()
 
 # Use statistical methods to understand if there are correlations between the samples mu_1, mu_2, and mu_3
@@ -43,6 +51,6 @@ print(p_values)
 
 # Plot the p-values
 sns.heatmap(p_values, xticklabels=correlations.columns, yticklabels=correlations.columns, cmap="YlGnBu")
-plt.title("P-values for correlations between samples")
+plt.title("P-values for correlations between species")
 plt.show()
 
