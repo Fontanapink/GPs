@@ -10,9 +10,9 @@ import sys
 import math
 
 # Import the data mu_1.csv, mu_2.csv, and mu_3.csv and combine them into one data frame
-data1 = pd.read_csv("TestingIndependentFits/mu_1.csv")
-data2 = pd.read_csv("TestingIndependentFits/mu_2.csv")
-data3 = pd.read_csv("TestingIndependentFits/mu_3.csv")
+data1 = pd.read_csv("TestingIndependentFitsGPR/mu_1.csv")
+data2 = pd.read_csv("TestingIndependentFitsGPR/mu_2.csv")
+data3 = pd.read_csv("TestingIndependentFitsGPR/mu_3.csv")
 data = pd.concat([data1, data2, data3], axis=1)
 data.columns = ["Y_1", "Y_2", "Y_3"]
 
