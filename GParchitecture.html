@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titles with Bullet Points</title>
+    <style>
+        .title-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .title-section {
+            margin: 0 15px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .title-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .title-section li:hover .tooltip {
+            display: block;
+        }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title-container">
+        <div class="title-section">
+            <h3>Prior Constraints</h3>
+            <ul>
+                <li>ODE-constraining <span class="tooltip">Description of Word1</span></li>
+                <li>Word2 <span class="tooltip">Description of Word2</span></li>
+                <li>Word3 <span class="tooltip">Description of Word3</span></li>
+                <li>Word4 <span class="tooltip">Description of Word4</span></li>
+                <li>Word5 <span class="tooltip">Description of Word5</span></li>
+            </ul>
+        </div>
+        <div class="title-section">
+            <h3>Kernel Learning</h3>
+            <ul>
+                <li>Kernel-based approach <span class="tooltip">Description of Word1</span></li>
+                <li>Simple <span class="tooltip">Description of Word2</span></li>
+                <li>Complex <span class="tooltip">Description of Word3</span></li>
+                <li>Word4 <span class="tooltip">Description of Word4</span></li>
+                <li>Word5 <span class="tooltip">Description of Word5</span></li>
+            </ul>
+        </div>
+        <div class="title-section">
+            <h3>Model Architecture</h3>
+            <ul>
+                <li>Normal <span class="tooltip">Description of Word1</span></li>
+                <li>GP-NFIR <span class="tooltip">Description of Word2</span></li>
+                <li>GP-NARX <span class="tooltip">Description of Word3</span></li>
+                <li>GP-NOE <span class="tooltip">Description of Word4</span></li>
+                <li>state-space (GPSS) <span class="tooltip">Description of Word5</span></li>
+                <li>Latent <span class="tooltip">Description of Word5</span></li>
+                <li>Sparce <span class="tooltip">Description of Word5</span></li>
+                <li>Variational <span class="tooltip">Description of Word5</span></li>
+                <li>Auto-regressive <span class="tooltip">Description of Word5</span></li>
+            </ul>
+        </div>
+        <div class="title-section">
+            <h3>Posterior Constraints</h3>
+            <ul>
+                <li>Constraining Solution Space <span class="tooltip">Description of Word1</span></li>
+                <li>Word2 <span class="tooltip">Description of Word2</span></li>
+                <li>Word3 <span class="tooltip">Description of Word3</span></li>
+                <li>Word4 <span class="tooltip">Description of Word4</span></li>
+                <li>Word5 <span class="tooltip">Description of Word5</span></li>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>
