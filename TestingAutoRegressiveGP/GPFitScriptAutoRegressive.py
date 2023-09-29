@@ -110,7 +110,7 @@ def plot_gp_d(x, mu, var, color, label, ax):
     ax.set_ylabel("y")
 
 # This function is used to plot the results of the fitted model and the data
-def plot_model(m, X, Y, P, K_L, M_F, BIC, i):
+def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
     # plot the data, only one plot for each species
     fig, ax = plt.subplots(figsize=(15, 5), ncols=1, nrows=1)
     # FIXME: this should be a loop over the number of species once that is automatic
@@ -121,7 +121,7 @@ def plot_model(m, X, Y, P, K_L, M_F, BIC, i):
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(X)
     # save the prediced mu1 values to a csv file
-    np.savetxt("mu_" + str(i)+ ".csv", mu1, delimiter=",")
+    np.savetxt(os.path.join(os.getcwd(),'outputs_', inputFileName, "mu_" + str(i)+ ".csv", mu1, delimiter=","))
 
 
     plot_gp_d(X, mu1, var1, "r", "Y1", ax)
@@ -232,11 +232,22 @@ def main():
         print('The input file is not a csv file')
         sys.exit()
 
+    # Store the input filename without the extension
+    inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
+
     outputFile = args['output']
     # Check if the output file path exists, if not, set it to the current directory
     if not os.path.isdir(os.path.dirname(outputFile)):
         print('The output file path does not exist, setting it to the current directory')
         outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
+
+    # Check if the 'outputs' folder exists, else create it
+    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs')):
+        os.mkdir(os.path.join(os.getcwd(), 'outputs'))
+    
+    # Check if in the outputs folder there is a folder with the same name the input file has, else create it
+    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs_', inputFileName)):
+        os.mkdir(os.path.join(os.getcwd(), 'outputs_', inputFileName))
 
     # Store the maximum number of iterations for the optimization
     global MAXITER 
@@ -283,8 +294,8 @@ def main():
 
 
         # Finally, plot the model
-        plot_model(m, X, Y, P, K_L, M_F, BIC, i)
-        plt.savefig(os.path.join(os.getcwd(), 'Y_' + str(i) + 'plot.png'), dpi=500)
+        plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName)
+        plt.savefig(os.path.join(os.getcwd(),'outputs_', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
         plt.show()
         # Save the figure to a file in the current directory
 
@@ -296,7 +307,7 @@ def main():
         plt.plot(BICs.index(BIC), BIC, 'ro')
         plt.xlabel('Model')
         plt.ylabel('BIC')
-        plt.savefig(os.path.join(os.getcwd(), 'Y_' + str(i) + 'BICs.png'), dpi=500)
+        plt.savefig(os.path.join(os.getcwd(),'outputs_', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
         plt.show()
 
         i+=1
