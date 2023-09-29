@@ -110,7 +110,7 @@ def plot_gp_d(x, mu, var, color, label, ax):
     ax.set_ylabel("y")
 
 # This function is used to plot the results of the fitted model and the data
-def plot_model(m, X, Y, P, K_L, M_F, BIC, i):
+def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
     # plot the data, only one plot for each species
     fig, ax = plt.subplots(figsize=(15, 5), ncols=1, nrows=1)
     # FIXME: this should be a loop over the number of species once that is automatic
@@ -120,8 +120,9 @@ def plot_model(m, X, Y, P, K_L, M_F, BIC, i):
 
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(X)
-    # save the prediced mu1 values to a csv file
-    np.savetxt("mu_" + str(i)+ ".csv", mu1, delimiter=",")
+    # save the prediced mu1 values to a csv file in the inputfilename folder
+    np.savetxt(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'mu1.csv'), mu1, delimiter=',')
+    
 
 
     plot_gp_d(X, mu1, var1, "r", "Y1", ax)
@@ -188,52 +189,13 @@ def fit_model(X_aug, Y_aug, P, K_L=gpf.kernels.SquaredExponential, M_F=None):
 
     return m, BIC
 
-def main():
-    parser = argparse.ArgumentParser(description='Gaussian Process fitting and plotting script')
-    parser.add_argument('-i','--input', help='Input file name/path with simulated data', required=True)
-    parser.add_argument('-o','--output', help='Output file path where output files/models are going to be stored', required=False, default='output.csv')
-    # make maxiter an optional input argument, with a default value of 5000
-    parser.add_argument('-m','--maxiter', help='Maximum number of iterations for the optimization', required=False, default=10000)
-    args = vars(parser.parse_args())
-
-    # Store the input arguments
-    inputFile = args['input']
-    # Check if the input file exists, if not, exit the script with an error message
-    if not os.path.isfile(inputFile):
-        print('The input file does not exist')
-        sys.exit()
-    # Check if the input file is empty, if it is, exit the script with an error message    
-    if os.path.getsize(inputFile) == 0:
-        print('The input file is empty')
-        sys.exit()
-    # Check if the input file is a csv file, if not, exit the script with an error message    
-    if not os.path.splitext(inputFile)[1] == '.csv':
-        print('The input file is not a csv file')
-        sys.exit()
-
-    outputFile = args['output']
-    # Check if the output file path exists, if not, set it to the current directory
-    if not os.path.isdir(os.path.dirname(outputFile)):
-        print('The output file path does not exist, setting it to the current directory')
-        outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
-
-    # Store the maximum number of iterations for the optimization
-    global MAXITER 
-    MAXITER = reduce_in_tests(args['maxiter'])
-
-    data = importData(inputFile)
-    # store the time series data in a variable, without the column header
-    
-    # Generate the library of all the possible kernel, mean, and latent processes combinations
-    library = generateLibrary()
-
-
-
+def fit_GP_models(data, library, inputFileName):
 
     # P and L are the number of species and latent processes respectively
     # FIXME: These should be input arguments or obtained from the input data
     P = 1
 
+    # store the time series data in a variable, without the column header
     timeSeries = data.iloc[:, 0].values
     timeSeries = timeSeries.reshape(-1, 1)
 
@@ -262,8 +224,8 @@ def main():
 
 
         # Finally, plot the model
-        plot_model(m, timeSeries, y, P, K_L, M_F, BIC, i)
-        plt.savefig(os.path.join(os.getcwd(), 'Y_' + str(i) + 'plot.png'), dpi=500)
+        plot_model(m, timeSeries, y, P, K_L, M_F, BIC, i, inputFileName)
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
         plt.show()
         # Save the figure to a file in the current directory
 
@@ -275,10 +237,73 @@ def main():
         plt.plot(BICs.index(BIC), BIC, 'ro')
         plt.xlabel('Model')
         plt.ylabel('BIC')
-        plt.savefig(os.path.join(os.getcwd(), 'Y_' + str(i) + 'BICs.png'), dpi=500)
+
+        # Save the figure to a file in the current directory, in a new folder called 'output'
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
         plt.show()
 
         i+=1
+
+
+def main():
+    # Generate the library of all the possible kernel, mean, and latent processes combinations
+    library = generateLibrary()
+
+    # Parse the input arguments
+    parser = argparse.ArgumentParser(description='Gaussian Process fitting and plotting script')
+    parser.add_argument('-i','--input', help='Input file name/path with simulated data', required=True)
+    parser.add_argument('-o','--output', help='Output file path where output files/models are going to be stored', required=False, default='output.csv')
+    # make maxiter an optional input argument, with a default value of 5000
+    parser.add_argument('-m','--maxiter', help='Maximum number of iterations for the optimization', required=False, default=10000)
+    args = vars(parser.parse_args())
+
+    # Store the maximum number of iterations for the optimization
+    global MAXITER 
+    MAXITER = reduce_in_tests(args['maxiter'])
+
+    # Store the output file path
+    outputFile = args['output']
+    # Check if the output file path exists, if not, set it to the current directory
+    if not os.path.isdir(os.path.dirname(outputFile)):
+        print('The output file path does not exist, setting it to the current directory')
+        outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
+
+    # Check if the 'outputs' folder exists, else create it
+    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs')):
+        os.mkdir(os.path.join(os.getcwd(), 'outputs'))
+    
+    
+    # Store the input arguments
+    inputFile = args['input']
+    # Check if the input file exists, if not, exit the script with an error message
+    if not os.path.isfile(inputFile):
+        print('The input file does not exist')
+        sys.exit()
+    # Check if the input file is empty, if it is, exit the script with an error message    
+    if os.path.getsize(inputFile) == 0:
+        print('The input file is empty')
+        sys.exit()
+    # Check if the input file is a csv file, if not, exit the script with an error message    
+    if not os.path.splitext(inputFile)[1] == '.csv':
+        print('The input file is not a csv file')
+        sys.exit()
+
+    # Store the input filename without the extension
+    inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
+
+  
+    # Check if in the outputs folder there is a folder with the same name the input file has, else create it
+    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
+        os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+
+
+    # Import the data from the file
+    data = importData(inputFile)
+  
+    # Fit the GP models to the data
+    fit_GP_models(data, library, inputFileName)
+
+
 
 if __name__ == "__main__":
     main()
