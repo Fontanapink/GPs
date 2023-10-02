@@ -189,7 +189,7 @@ def fit_model(X_aug, Y_aug, P, K_L=gpf.kernels.SquaredExponential, M_F=None):
 
     return m, BIC
 
-def fit_GP_models(data, library, inputFileName):
+def fit_GP_models(data, library, inputFileName, showgraphs):
 
     # P and L are the number of species and latent processes respectively
     # FIXME: These should be input arguments or obtained from the input data
@@ -225,10 +225,11 @@ def fit_GP_models(data, library, inputFileName):
 
         # Finally, plot the model
         plot_model(m, timeSeries, y, P, K_L, M_F, BIC, i, inputFileName)
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
-        plt.show()
         # Save the figure to a file in the current directory
-
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
+        
+        if showgraphs:
+            plt.show()
 
         # Show a plot with all the calculated BIC values
         # and the one chosen to be the best
@@ -240,7 +241,9 @@ def fit_GP_models(data, library, inputFileName):
 
         # Save the figure to a file in the current directory, in a new folder called 'output'
         plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
-        plt.show()
+
+        if showgraphs:
+            plt.show()
 
         i+=1
 
@@ -255,6 +258,8 @@ def main():
     parser.add_argument('-o','--output', help='Output file path where output files/models are going to be stored', required=False, default='output.csv')
     # make maxiter an optional input argument, with a default value of 5000
     parser.add_argument('-m','--maxiter', help='Maximum number of iterations for the optimization', required=False, default=10000)
+    # make showgraphs an optional input argument, with a default value of 'No'
+    parser.add_argument('-g','--showgraphs', help='Show graphs', required=False, action='store_true')
     args = vars(parser.parse_args())
 
     # Store the maximum number of iterations for the optimization
@@ -276,33 +281,54 @@ def main():
     # Store the input arguments
     inputFile = args['input']
     # Check if the input file exists, if not, exit the script with an error message
-    if not os.path.isfile(inputFile):
-        print('The input file does not exist')
-        sys.exit()
-    # Check if the input file is empty, if it is, exit the script with an error message    
-    if os.path.getsize(inputFile) == 0:
-        print('The input file is empty')
-        sys.exit()
-    # Check if the input file is a csv file, if not, exit the script with an error message    
-    if not os.path.splitext(inputFile)[1] == '.csv':
-        print('The input file is not a csv file')
+    if not os.path.exists(inputFile):
+        print('The input file or folder does not exist')
         sys.exit()
 
-    # Store the input filename without the extension
-    inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
+    # Check if the input is a file or a folder
+    if os.path.isfile(inputFile):
+        # Check if the input file is empty, if it is, exit the script with an error message    
+        if os.path.getsize(inputFile) == 0:
+            print('The input file is empty')
+            sys.exit()
+        # Check if the input file is a csv file, if not, exit the script with an error message    
+        if not os.path.splitext(inputFile)[1] == '.csv':
+            print('The input file is not a csv file')
+            sys.exit()
 
-  
-    # Check if in the outputs folder there is a folder with the same name the input file has, else create it
-    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
-        os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+        # Store the input filename without the extension
+        inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
 
+        # Check if in the outputs folder there is a folder with the same name the input file has, else create it
+        if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
+            os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
 
-    # Import the data from the file
-    data = importData(inputFile)
-  
-    # Fit the GP models to the data
-    fit_GP_models(data, library, inputFileName)
+        # Import the data from the file
+        data = importData(inputFile)
 
+        # Fit the GP models to the data
+        fit_GP_models(data, library, inputFileName, showgraphs=args['showgraphs'])
+    
+    elif os.path.isdir(inputFile):
+        # Loop through all the csv files in the folder
+        for file in os.listdir(inputFile):
+            if file.endswith(".csv"):
+                # Store the input filename without the extension
+                inputFileName = os.path.splitext(os.path.basename(file))[0]
+
+                # Check if in the outputs folder there is a folder with the same name the input file has, else create it
+                if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
+                    os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+
+                # Import the data from the file
+                data = importData(os.path.join(inputFile, file))
+
+                # Fit the GP models to the data
+                fit_GP_models(data, library, inputFileName, showgraphs=args['showgraphs'])
+    
+    else:
+        print('The input is not a file or a folder')
+        sys.exit()
 
 
 if __name__ == "__main__":
