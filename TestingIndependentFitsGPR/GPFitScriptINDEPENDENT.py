@@ -122,7 +122,7 @@ def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
     mu1, var1 = m.predict_y(X)
     # save the prediced mu1 values to a csv file in the inputfilename folder
     np.savetxt(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'mu1.csv'), mu1, delimiter=',')
-    
+
 
 
     plot_gp_d(X, mu1, var1, "r", "Y1", ax)
