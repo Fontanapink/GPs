@@ -249,11 +249,12 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
 
         # Finally, plot the model
         plot_model(m, timeSeries, y, P, L, K_L, M_F, BIC, i, inputFileName)
-        # Save the figure to a file in the current directory
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
-        
         if showgraphs:
             plt.show()
+        # Save the figure to a file in the current directory
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
+        plt.close()
+
 
         # Show a plot with all the calculated BIC values
         # and the one chosen to be the best
@@ -263,11 +264,11 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
         plt.xlabel('Model')
         plt.ylabel('BIC')
 
-        # Save the figure to a file in the current directory, in a new folder called 'output'
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
-
         if showgraphs:
             plt.show()
+        # Save the figure to a file in the current directory, in a new folder called 'output'
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
+        plt.close()
 
         i+=1
 

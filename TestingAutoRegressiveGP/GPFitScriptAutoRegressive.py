@@ -190,20 +190,18 @@ def fit_model(X_aug, Y_aug, P, K_L=gpf.kernels.SquaredExponential, M_F=None):
     return m, BIC
 
 # Create a function that will create shift the data by a given number of time steps
-def shiftData(x_data, y_data, shift):
-    # Input data is observed value with `shift` steps of delay
-    #X = pd.concat([x_data.shift(-shift), x_data], axis=1).set_axis([0,1],axis=1).iloc[:-shift]
-
+# For an autoregressive model, the input data is the observed value with `shift` steps of delay
+# So, the X data is the observed value with 
+def shiftData(y_data, shift):
     # copy x_data and y_data into a dataframe
-    x_data = pd.DataFrame(x_data)
-    y_data = pd.DataFrame(y_data)
+    data = pd.DataFrame(y_data)
 
     # Input data is observed valued with 2 steps of delay
-    X = pd.concat([x_data.shift(-2), x_data.shift(-1), x_data], axis=1).set_axis([0,1,2],axis=1).iloc[:-3]
-
+    X = pd.concat([data.shift(-2), data.shift(-1), data], axis=1).set_axis([0,1,2],axis=1).iloc[:-3]
+ 
     # Output
-    Y = y_data.shift(-3).iloc[:-3]
-
+    Y = data.shift(-3).iloc[:-3]
+ 
     # Turn into Numpy arrays
     X = X.values
     Y = Y.values.reshape(-1,1)
@@ -224,7 +222,7 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
     i = 1
     for y in data.iloc[:, 1:].values.T:
         #X, Y = augmentData(timeSeries, y)
-        X, Y = shiftData(timeSeries, y, 3)
+        X, Y = shiftData(y, 3)
 
         # Fit each of the models in the library to the data
         # and store the results in a list
@@ -246,11 +244,12 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
 
         # Finally, plot the model
         plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName)
-        # Save the figure to a file in the current directory
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
-        
         if showgraphs:
             plt.show()
+        # Save the figure to a file in the current directory
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
+        plt.close()
+
 
         # Show a plot with all the calculated BIC values
         # and the one chosen to be the best
@@ -260,11 +259,11 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
         plt.xlabel('Model')
         plt.ylabel('BIC')
 
-        # Save the figure to a file in the current directory, in a new folder called 'output'
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
-
         if showgraphs:
             plt.show()
+        # Save the figure to a file in the current directory, in a new folder called 'output'
+        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
+        plt.close()
 
         i+=1
 
