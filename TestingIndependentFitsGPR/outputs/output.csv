@@ -30,3 +30,5 @@ simulations8,Species 3,435.90438055230305,RationalQuadratic,Zero
 simulations9,Species 1,730.0040530358327,RationalQuadratic,Zero
 simulations9,Species 2,567.2902234226425,RationalQuadratic,Zero
 simulations9,Species 3,542.9037356504175,RationalQuadratic,Zero
+Input File,Species,BIC,Kernel,Mean
+simulations0,Species 1,775.288514494286,RationalQuadratic,Zero

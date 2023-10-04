@@ -1,0 +1,9 @@
+gpflow==2.9.0
+matplotlib==3.7.2
+numpy==1.24.3
+pandas==2.0.3
+pretty_errors==1.2.25
+scipy==1.11.3
+seaborn==0.13.0
+tensorflow==2.13.0
+tensorflow_intel==2.13.0
