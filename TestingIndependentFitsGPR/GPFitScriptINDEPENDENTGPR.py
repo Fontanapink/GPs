@@ -283,7 +283,7 @@ def main():
         outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
 
     # Check if the 'outputs' folder exists, else create it
-    outputsFolder = os.path.join(os.getcwd(), 'outputs_GPR')
+    outputsFolder = os.path.join(outputFile, 'outputs_GPR')
     if not os.path.isdir(outputsFolder):
         os.mkdir(outputsFolder)
 

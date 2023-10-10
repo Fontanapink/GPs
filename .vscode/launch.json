@@ -10,6 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "cwd": "${fileDirname}", // this sets the ynamic working directory (i.e. the directory where the currently-open Python file is located)
             "justMyCode": true,
             "args": [
                 "-i",
