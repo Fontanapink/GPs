@@ -190,7 +190,7 @@ def fit_model(X_aug, Y_aug, P, K_L=gpf.kernels.SquaredExponential, M_F=None):
 
     return m, BIC
 
-def fit_GP_models(data, library, inputFileName, showgraphs, writer):
+def fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs, writer):
 
     # P and L are the number of species and latent processes respectively
     # FIXME: These should be input arguments or obtained from the input data
@@ -231,7 +231,7 @@ def fit_GP_models(data, library, inputFileName, showgraphs, writer):
         if showgraphs:
             plt.show()
         # Save the figure to a file in the current directory
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
+        plt.savefig(os.path.join(outputFolderPath, 'Y_' + str(i) + 'plot.png'), dpi=500)
         plt.close()
 
 
@@ -246,11 +246,16 @@ def fit_GP_models(data, library, inputFileName, showgraphs, writer):
         if showgraphs:
             plt.show()
         # Save the figure to a file in the current directory, in a new folder called 'output'
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
+        plt.savefig(os.path.join(outputFolderPath, 'Y_' + str(i) + 'BICs.png'), dpi=500)
         plt.close()
 
         i+=1
 
+
+import os
+import argparse
+import sys
+import csv
 
 def main():
     # Generate the library of all the possible kernel, mean, and latent processes combinations
@@ -278,10 +283,10 @@ def main():
         outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
 
     # Check if the 'outputs' folder exists, else create it
-    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs')):
-        os.mkdir(os.path.join(os.getcwd(), 'outputs'))
-    
-    
+    outputsFolder = os.path.join(os.getcwd(), 'outputs_GPR')
+    if not os.path.isdir(outputsFolder):
+        os.mkdir(outputsFolder)
+
     # Store the input arguments
     inputFile = args['input']
     # Check if the input file exists, if not, exit the script with an error message
@@ -303,24 +308,25 @@ def main():
         # Store the input filename without the extension
         inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
 
-        # Check if in the outputs folder there is a folder with the same name the input file has, else create it
-        if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
-            os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+        # Check if in the outputs folder there is a folder with the same name as the input file, else create it
+        outputFolderPath = os.path.join(outputsFolder, inputFileName)
+        if not os.path.isdir(outputFolderPath):
+            os.mkdir(outputFolderPath)
 
         # Import the data from the file
         data = importData(inputFile)
 
-        output_file = os.path.join(os.getcwd(),'outputs', 'output.csv')
+        output_file = os.path.join(outputFolderPath, 'output.csv')
 
         with open(output_file, 'a') as file:
             writer = csv.writer(file)
             writer.writerow(['Input File', 'Species', 'BIC', 'Kernel', 'Mean'])
 
             # Fit the GP models to the data
-            fit_GP_models(data, library, inputFileName, showgraphs=args['showgraphs'],writer=writer)
+            fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs=args['showgraphs'], writer=writer)
     
     elif os.path.isdir(inputFile):
-        output_file = os.path.join(os.getcwd(),'outputs', 'output.csv')
+        output_file = os.path.join(outputsFolder, 'output.csv')
         with open(output_file, 'a') as file:
             writer = csv.writer(file)
             writer.writerow(['Input File', 'Species', 'BIC', 'Kernel', 'Mean'])
@@ -330,19 +336,21 @@ def main():
                     # Store the input filename without the extension
                     inputFileName = os.path.splitext(os.path.basename(file))[0]
 
-                    # Check if in the outputs folder there is a folder with the same name the input file has, else create it
-                    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
-                        os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+                    # Check if in the outputs folder there is a folder with the same name as the input file, else create it
+                    outputFolderPath = os.path.join(outputsFolder, inputFileName)
+                    if not os.path.isdir(outputFolderPath):
+                        os.mkdir(outputFolderPath)
 
                     # Import the data from the file
                     data = importData(os.path.join(inputFile, file))
 
                     # Fit the GP models to the data
-                    fit_GP_models(data, library, inputFileName, showgraphs=args['showgraphs'],writer=writer)
+                    fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs=args['showgraphs'], writer=writer)
     
     else:
         print('The input is not a file or a folder')
         sys.exit()
+
 
 
 if __name__ == "__main__":
