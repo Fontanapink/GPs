@@ -111,7 +111,7 @@ def plot_gp_d(x, mu, var, color, label, ax):
     ax.set_ylabel("y")
 
 # This function is used to plot the results of the fitted model and the data
-def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
+def plot_model(m, X, Y, P, K_L, M_F, BIC, i, outputFolderPath):
     # plot the data, only one plot for each species
     fig, ax = plt.subplots(figsize=(15, 5), ncols=1, nrows=1)
     # FIXME: this should be a loop over the number of species once that is automatic
@@ -122,7 +122,7 @@ def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(X)
     # save the prediced mu1 values to a csv file in the inputfilename folder
-    np.savetxt(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'mu1.csv'), mu1, delimiter=',')
+    np.savetxt(os.path.join(outputFolderPath, 'Y_' + str(i) + 'mu1.csv'), mu1, delimiter=',')
 
 
 
@@ -227,7 +227,7 @@ def fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs, wr
         writer.writerow([inputFileName, f'Species {i}', BIC, K_L.__name__, M_F.__class__.__name__])
 
         # Finally, plot the model
-        plot_model(m, timeSeries, y, P, K_L, M_F, BIC, i, inputFileName)
+        plot_model(m, timeSeries, y, P, K_L, M_F, BIC, i, outputFolderPath)
         if showgraphs:
             plt.show()
         # Save the figure to a file in the current directory
@@ -251,11 +251,6 @@ def fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs, wr
 
         i+=1
 
-
-import os
-import argparse
-import sys
-import csv
 
 def main():
     # Generate the library of all the possible kernel, mean, and latent processes combinations
