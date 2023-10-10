@@ -247,10 +247,10 @@ def fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs, wr
         M_F = bestModel[3]
         L = bestModel[4]
         # Write the results to the output file
-        writer.writerow([inputFileName, f'Species {i}', BIC, K_L.__name__, M_F.__class__.__name__], L)
+        writer.writerow([inputFileName, f'Species {i}', BIC, K_L.__name__, M_F.__class__.__name__, L])
 
         # Finally, plot the model
-        plot_model(m, timeSeries, y, P, L, K_L, M_F, BIC, i, inputFileName)
+        plot_model(m, timeSeries, y, P, L, K_L, M_F, BIC, i, outputFolderPath)
         if showgraphs:
             plt.show()
         # Save the figure to a file in the current directory
