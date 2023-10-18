@@ -43,6 +43,7 @@ from gpflow.utilities import parameter_dict
 from gpflow.ci_utils import reduce_in_tests
 gpf.config.set_default_float(np.float64)
 gpf.config.set_default_summary_fmt("notebook")
+import csv
 
 import tensorflow as tf
 import time
@@ -110,7 +111,7 @@ def plot_gp_d(x, mu, var, color, label, ax):
     ax.set_ylabel("y")
 
 # This function is used to plot the results of the fitted model and the data
-def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
+def plot_model(m, X, Y, P, K_L, M_F, BIC, i, outputFolderPath):
     # plot the data, only one plot for each species
     fig, ax = plt.subplots(figsize=(15, 5), ncols=1, nrows=1)
     # FIXME: this should be a loop over the number of species once that is automatic
@@ -121,7 +122,7 @@ def plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName):
     # just use the GP to predict at same timepoints
     mu1, var1 = m.predict_y(X)
     # save the prediced mu1 values to a csv file in the inputfilename folder
-    np.savetxt(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'mu1.csv'), mu1, delimiter=',')
+    np.savetxt(os.path.join(outputFolderPath, 'Y_' + str(i) + 'mu1.csv'), mu1, delimiter=',')
 
 
 
@@ -208,7 +209,8 @@ def shiftData(y_data, shift):
 
     return X, Y
 
-def fit_GP_models(data, library, inputFileName, showgraphs):
+def fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs, writer):
+
 
     # P and L are the number of species and latent processes respectively
     # FIXME: These should be input arguments or obtained from the input data
@@ -241,13 +243,15 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
         K_L = bestModel[2]
         M_F = bestModel[3]
 
+        # Write the results to the output file
+        writer.writerow([inputFileName, f'Species {i}', BIC, K_L.__name__, M_F.__class__.__name__])
 
         # Finally, plot the model
-        plot_model(m, X, Y, P, K_L, M_F, BIC, i, inputFileName)
+        plot_model(m, X, Y, P, K_L, M_F, BIC, i, outputFolderPath)
         if showgraphs:
             plt.show()
         # Save the figure to a file in the current directory
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'plot.png'), dpi=500)
+        plt.savefig(os.path.join(outputFolderPath, 'Y_' + str(i) + 'plot.png'), dpi=500)
         plt.close()
 
 
@@ -262,7 +266,7 @@ def fit_GP_models(data, library, inputFileName, showgraphs):
         if showgraphs:
             plt.show()
         # Save the figure to a file in the current directory, in a new folder called 'output'
-        plt.savefig(os.path.join(os.getcwd(),'outputs', inputFileName, 'Y_' + str(i) + 'BICs.png'), dpi=500)
+        plt.savefig(os.path.join(outputFolderPath, 'Y_' + str(i) + 'BICs.png'), dpi=500)
         plt.close()
 
         i+=1
@@ -294,10 +298,10 @@ def main():
         outputFile = os.path.join(os.getcwd(), os.path.basename(outputFile))
 
     # Check if the 'outputs' folder exists, else create it
-    if not os.path.isdir(os.path.join(os.getcwd(), 'outputs')):
-        os.mkdir(os.path.join(os.getcwd(), 'outputs'))
-    
-    
+    outputsFolder = os.path.join(outputFile, 'outputs_auto_regressive')
+    if not os.path.isdir(outputsFolder):
+        os.mkdir(outputsFolder)
+
     # Store the input arguments
     inputFile = args['input']
     # Check if the input file exists, if not, exit the script with an error message
@@ -319,36 +323,49 @@ def main():
         # Store the input filename without the extension
         inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
 
-        # Check if in the outputs folder there is a folder with the same name the input file has, else create it
-        if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
-            os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+        # Check if in the outputs folder there is a folder with the same name as the input file, else create it
+        outputFolderPath = os.path.join(outputsFolder, inputFileName)
+        if not os.path.isdir(outputFolderPath):
+            os.mkdir(outputFolderPath)
 
         # Import the data from the file
         data = importData(inputFile)
 
-        # Fit the GP models to the data
-        fit_GP_models(data, library, inputFileName, showgraphs=args['showgraphs'])
+        output_file = os.path.join(outputFolderPath, 'output.csv')
+
+        with open(output_file, 'a') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Input File', 'Species', 'BIC', 'Kernel', 'Mean'])
+
+            # Fit the GP models to the data
+            fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs=args['showgraphs'], writer=writer)
     
     elif os.path.isdir(inputFile):
-        # Loop through all the csv files in the folder
-        for file in os.listdir(inputFile):
-            if file.endswith(".csv"):
-                # Store the input filename without the extension
-                inputFileName = os.path.splitext(os.path.basename(file))[0]
+        output_file = os.path.join(outputsFolder, 'output.csv')
+        with open(output_file, 'a') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Input File', 'Species', 'BIC', 'Kernel', 'Mean'])
+            # Loop through all the csv files in the folder
+            for file in os.listdir(inputFile):
+                if file.endswith(".csv"):
+                    # Store the input filename without the extension
+                    inputFileName = os.path.splitext(os.path.basename(file))[0]
 
-                # Check if in the outputs folder there is a folder with the same name the input file has, else create it
-                if not os.path.isdir(os.path.join(os.getcwd(), 'outputs', inputFileName)):
-                    os.mkdir(os.path.join(os.getcwd(), 'outputs', inputFileName))
+                    # Check if in the outputs folder there is a folder with the same name as the input file, else create it
+                    outputFolderPath = os.path.join(outputsFolder, inputFileName)
+                    if not os.path.isdir(outputFolderPath):
+                        os.mkdir(outputFolderPath)
 
-                # Import the data from the file
-                data = importData(os.path.join(inputFile, file))
+                    # Import the data from the file
+                    data = importData(os.path.join(inputFile, file))
 
-                # Fit the GP models to the data
-                fit_GP_models(data, library, inputFileName, showgraphs=args['showgraphs'])
+                    # Fit the GP models to the data
+                    fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs=args['showgraphs'], writer=writer)
     
     else:
         print('The input is not a file or a folder')
         sys.exit()
+
 
 
 if __name__ == "__main__":
