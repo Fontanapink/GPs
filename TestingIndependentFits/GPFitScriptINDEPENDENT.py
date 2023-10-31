@@ -95,7 +95,7 @@ def generateLibrary():
     # Define the list of all the possible combinations of kernel, mean, and latent processes
     library = []
     for kernel in kernelList:
-        library.append([kernel, mean, likelihood])
+        library.append([kernel, mean])
     # Return the library
     return library
 
@@ -128,7 +128,7 @@ def plot_model(m, X, Y, P, L, K_L, M_F, BIC, i, outputFolderPath):
 
 
 
-    plot_gp_d(X, mu1, var1, "b", "Y1", ax)
+    plot_gp_d(X, mu1, var1, "r", "Y1", ax)
     ax.set_xlabel("time")
     ax.set_ylabel("y")
 
@@ -231,7 +231,7 @@ def fit_GP_models(data, library, inputFileName, outputFolderPath, showgraphs, wr
         # Fit each of the models in the library to the data
         # and store the results in a list
         results = []
-        for kernel, mean, latent in library:
+        for kernel, mean in library:
             for L in [1, 2, 3]:
                 print("kernel: ", str(kernel.__name__), ", mean: ", str(mean.__class__.__name__), ", latent: ", L)
                 m, BIC = fit_model(X, Y, P, L, kernel, mean)
