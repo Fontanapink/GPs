@@ -1,31 +1,62 @@
-Input File,Species,BIC,Kernel,Mean
-simulations0,Species 1,46278.63633445571,RationalQuadratic,Zero,3
-simulations0,Species 2,45803.404237470466,RationalQuadratic,Zero,3
-simulations0,Species 3,45920.41009193055,RationalQuadratic,Zero,3
-simulations1,Species 1,45623.960187349614,RationalQuadratic,Zero,3
-simulations1,Species 2,45962.10200868079,RationalQuadratic,Zero,3
-simulations1,Species 3,46002.226168037465,RationalQuadratic,Zero,3
-simulations2,Species 1,46256.42752497316,RationalQuadratic,Zero,3
-simulations2,Species 2,46518.45455551812,RationalQuadratic,Zero,3
-simulations2,Species 3,45777.3760525569,RationalQuadratic,Zero,3
-simulations3,Species 1,46380.702034672155,RationalQuadratic,Zero,3
-simulations3,Species 2,46511.281155327975,RationalQuadratic,Zero,3
-simulations3,Species 3,45881.12107950331,RationalQuadratic,Zero,3
-simulations4,Species 1,46323.40008495176,RationalQuadratic,Zero,3
-simulations4,Species 2,46210.629578945605,RationalQuadratic,Zero,3
-simulations4,Species 3,45985.23944265892,RationalQuadratic,Zero,3
-simulations5,Species 1,45780.53623693917,RationalQuadratic,Zero,3
-simulations5,Species 2,45883.45984257185,RationalQuadratic,Zero,3
-simulations5,Species 3,45677.89229390786,RationalQuadratic,Zero,3
-simulations6,Species 1,46078.002869883625,RationalQuadratic,Zero,3
-simulations6,Species 2,45975.404759610195,Matern32,Zero,3
-simulations6,Species 3,45804.62472523012,RationalQuadratic,Zero,3
-simulations7,Species 1,45828.34547436183,RationalQuadratic,Zero,3
-simulations7,Species 2,46251.30130479995,RationalQuadratic,Zero,3
-simulations7,Species 3,46265.81847932034,RationalQuadratic,Zero,3
-simulations8,Species 1,46052.10686085739,RationalQuadratic,Zero,3
-simulations8,Species 2,46020.72434104434,RationalQuadratic,Zero,3
-simulations8,Species 3,45945.89430610847,RationalQuadratic,Zero,3
-simulations9,Species 1,46240.07085304249,RationalQuadratic,Zero,3
-simulations9,Species 2,46077.32063055855,RationalQuadratic,Zero,3
-simulations9,Species 3,46052.900473349764,RationalQuadratic,Zero,3
+Input File   ,Species   ,BIC                ,Kernel            ,Mean ,Latent Process
+
+simulations0 ,Species 1 ,46278.63633445571  ,RationalQuadratic ,Zero ,             3
+
+simulations0 ,Species 2 ,45803.404237470466 ,RationalQuadratic ,Zero ,             3
+
+simulations0 ,Species 3 ,45920.41009193055  ,RationalQuadratic ,Zero ,             3
+
+simulations1 ,Species 1 ,45623.960187349614 ,RationalQuadratic ,Zero ,             3
+
+simulations1 ,Species 2 ,45962.10200868079  ,RationalQuadratic ,Zero ,             3
+
+simulations1 ,Species 3 ,46002.226168037465 ,RationalQuadratic ,Zero ,             3
+
+simulations2 ,Species 1 ,46256.42752497316  ,RationalQuadratic ,Zero ,             3
+
+simulations2 ,Species 2 ,46518.45455551812  ,RationalQuadratic ,Zero ,             3
+
+simulations2 ,Species 3 ,45777.3760525569   ,RationalQuadratic ,Zero ,             3
+
+simulations3 ,Species 1 ,46380.702034672155 ,RationalQuadratic ,Zero ,             3
+
+simulations3 ,Species 2 ,46511.281155327975 ,RationalQuadratic ,Zero ,             3
+
+simulations3 ,Species 3 ,45881.12107950331  ,RationalQuadratic ,Zero ,             3
+
+simulations4 ,Species 1 ,46323.40008495176  ,RationalQuadratic ,Zero ,             3
+
+simulations4 ,Species 2 ,46210.629578945605 ,RationalQuadratic ,Zero ,             3
+
+simulations4 ,Species 3 ,45985.23944265892  ,RationalQuadratic ,Zero ,             3
+
+simulations5 ,Species 1 ,45780.53623693917  ,RationalQuadratic ,Zero ,             3
+
+simulations5 ,Species 2 ,45883.45984257185  ,RationalQuadratic ,Zero ,             3
+
+simulations5 ,Species 3 ,45677.89229390786  ,RationalQuadratic ,Zero ,             3
+
+simulations6 ,Species 1 ,46078.002869883625 ,RationalQuadratic ,Zero ,             3
+
+simulations6 ,Species 2 ,45975.404759610195 ,Matern32          ,Zero ,             3
+
+simulations6 ,Species 3 ,45804.62472523012  ,RationalQuadratic ,Zero ,             3
+
+simulations7 ,Species 1 ,45828.34547436183  ,RationalQuadratic ,Zero ,             3
+
+simulations7 ,Species 2 ,46251.30130479995  ,RationalQuadratic ,Zero ,             3
+
+simulations7 ,Species 3 ,46265.81847932034  ,RationalQuadratic ,Zero ,             3
+
+simulations8 ,Species 1 ,46052.10686085739  ,RationalQuadratic ,Zero ,             3
+
+simulations8 ,Species 2 ,46020.72434104434  ,RationalQuadratic ,Zero ,             3
+
+simulations8 ,Species 3 ,45945.89430610847  ,RationalQuadratic ,Zero ,             3
+
+simulations9 ,Species 1 ,46240.07085304249  ,RationalQuadratic ,Zero ,             3
+
+simulations9 ,Species 2 ,46077.32063055855  ,RationalQuadratic ,Zero ,             3
+
+simulations9 ,Species 3 ,46052.900473349764 ,RationalQuadratic ,Zero ,             3
+
