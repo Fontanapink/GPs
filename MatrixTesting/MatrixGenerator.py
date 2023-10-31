@@ -31,6 +31,6 @@ def transform_to_matrix(filename):
     return matrices
 
 # Test the function with a sample .npy file
-matrices = transform_to_matrix(r'C:\Users\User\Dropbox\UCL\GPs\synthetic_data\test_GMLV\parms.npy')
+matrices = transform_to_matrix(r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\parms.npy')
 for matrix in matrices:
     print(matrix)

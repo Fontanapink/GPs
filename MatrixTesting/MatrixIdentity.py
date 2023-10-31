@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.stats as stats
 
+
 def matrix_properties(matrix):
     # Ensure matrix has ones on the diagonal
     assert np.allclose(np.diag(matrix), 1), "Matrix does not have 1s on the diagonal"
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     df = pd.DataFrame.from_dict(matrix_properties_list)
 
     # load other values from a csv file
-    other_values_list = pd.read_csv(r'C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\output.csv')
+    other_values_list = pd.read_csv(r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\outputAutoregressive.csv')
 
     new_df = other_values_list.loc[other_values_list['Species'] == 'Species 1']
     new_df.reset_index(drop=True, inplace=True)
