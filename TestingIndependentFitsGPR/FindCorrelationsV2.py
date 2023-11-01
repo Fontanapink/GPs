@@ -8,6 +8,7 @@ import scipy.stats as stats
 import os
 import sys
 import math
+import pretty_errors
 
 # Import the data mu_1.csv, mu_2.csv, and mu_3.csv and combine them into one data frame
 data1 = pd.read_csv(r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations0\Y_1mu1.csv")
@@ -45,13 +46,12 @@ def cross_correlation(series_a, series_b, lag):
     correlation = np.mean(series_a * series_b)
 
     # transform into a pandas dataframe
-    series_a = pd.DataFrame(series_a)
-    series_b = pd.DataFrame(series_b)
-    series = pd.concat([series_a, series_b], axis=1)
-    series.columns = ['a', 'b']
-    correlation = series.corr()
-    #print(series_a.corr(series_b))
-    #print(series_b.corr(series_a))
+    # series_a = pd.DataFrame(series_a)
+    # series_b = pd.DataFrame(series_b)
+    # series = pd.concat([series_a, series_b], axis=1)
+    # series.columns = ['a', 'b']
+    # correlation = series.corr()
+
     
     return correlation
 
