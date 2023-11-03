@@ -57,7 +57,7 @@ if __name__ == "__main__":
     for matrix in matrices:
         properties = matrix_properties(matrix)
         # Do something with the properties or print them
-        print(properties)
+        
         matrix_properties_list.append(properties)
     # Save the list to a file
     np.save(r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\matrix_properties_list.npy', matrix_properties_list)
@@ -74,8 +74,6 @@ if __name__ == "__main__":
     new_df = other_values_list.loc[other_values_list['Species'] == 'Species 1']
     new_df.reset_index(drop=True, inplace=True)
     df['kernel'] = new_df['Kernel']
-
-    print(df)
 
     # # Calculate correlation
     # correlation = df.corr(method='pearson')  # Pearson is standard, but you can use 'spearman' or 'kendall' too
