@@ -11,7 +11,7 @@ matrix_properties = np.load(
 matrices = np.load(
     r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\matrices.npy', allow_pickle=True)
 kernel_data = pd.read_csv(
-    r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\outputGPR.csv')
+    r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\outputAutoregressive.csv')
 
 # Map matrix properties to the kernel data
 id_to_properties_map = {int(id_str.replace('simulations', '')): props for id_str, props in zip(
@@ -62,5 +62,6 @@ for j in range(i + 1, len(axes)):
     fig.delaxes(axes[j])
 plt.tight_layout()
 # save the plot
-plt.savefig(r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\matrix_properties_boxplots.png')
+plt.savefig(
+    r'C:\Users\User\Dropbox\UCL\GPs\MatrixTesting\matrix_properties_boxplots.png')
 plt.show()
