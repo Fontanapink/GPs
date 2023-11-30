@@ -1,0 +1,1 @@
+So, the cross-correlation results obtained here and present in the powerpoint where generated using  the simulated data stored at synthetic_data/test_GMLV and not the 100 simulations generated using HPC.
