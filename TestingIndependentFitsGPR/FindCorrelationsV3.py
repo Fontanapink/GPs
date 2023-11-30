@@ -48,11 +48,11 @@ def generate_correlation_matrix(optimal_lags, series_names):
 
 # Load your data
 data1 = pd.read_csv(
-    r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations0\Y_1mu1.csv")
+    r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations1\Y_1mu1.csv")
 data2 = pd.read_csv(
-    r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations0\Y_2mu1.csv")
+    r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations1\Y_2mu1.csv")
 data3 = pd.read_csv(
-    r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations0\Y_3mu1.csv")
+    r"C:\Users\User\Dropbox\UCL\GPs\TestingIndependentFitsGPR\Testoutput\outputs_GPR\simulations1\Y_3mu1.csv")
 
 # Calculate the cross-correlations
 series_dict = {'series_a': data1, 'series_b': data2, 'series_c': data3}
@@ -82,8 +82,9 @@ for pair, (correlations, lags) in correlation_results.items():
 
 
 # Assuming interaction_matrix and cross_correlation_matrix are already defined and have the same shape
-interaction_matrix = np.array([[1, -7.77183873e-02, -7.15367830e-01], [
-                              1.38266163e-01, 1, 3.92161031e-02], [5.46835619e-01, 9.00077266e-02, 1]])
+interaction_matrix = np.array([[-1, 1.73982899e-01, -2.98956506e-02],
+                              [-5.79114846e-01, -1, 1.40688113e-01],
+                              [-9.47736878e-02, 2.05061035e-01, -1]])
 interaction_values = interaction_matrix[~np.eye(
     interaction_matrix.shape[0], dtype=bool)]
 cross_correlation_values = correlation_matrix.to_numpy(
