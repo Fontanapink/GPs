@@ -1,5 +1,6 @@
 {
     "CodeGPT.model": "CodeGPT Plus",
     "CodeGPT.apiKey": "CodeGPT Plus",
-    "python.analysis.autoImportCompletions": true
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "off"
 }
