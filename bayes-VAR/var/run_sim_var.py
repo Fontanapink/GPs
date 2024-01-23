@@ -78,6 +78,11 @@ def run_inference():
     data = generate_var1_data(n_obs, coefficients_true,
                               initial_values_true, noise_stddev)
 
+    fig, axs = plt.subplots(2, 1, figsize=(10, 4))
+    for i, ax in enumerate(axs):
+        axs[i].plot(data[:, i])
+    plt.savefig("plot-data.pdf")
+
     # PyMC3 model
     dim = len(initial_values_true)
 
